@@ -1,0 +1,15 @@
+{
+  "name": "year9-english-coach",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "qa": "node qa/e2e.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.55.0"
+  }
+}
