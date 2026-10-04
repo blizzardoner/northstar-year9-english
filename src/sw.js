@@ -1,4 +1,4 @@
-const CACHE = 'northstar-v2';
+const CACHE = 'northstar-v3';
 const SHELL = [
   './',
   './index.html',

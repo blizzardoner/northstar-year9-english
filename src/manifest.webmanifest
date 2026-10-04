@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#07101d",
-  "theme_color": "#08111f",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "lang": "en-AU",
   "categories": ["education", "productivity"],
   "icons": [
