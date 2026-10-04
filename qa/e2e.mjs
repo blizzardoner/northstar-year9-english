@@ -6,9 +6,10 @@ const browser = await chromium.launch({
   headless: true,
   executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
 });
+const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:4173/';
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 const page = await context.newPage();
-await page.goto('http://127.0.0.1:4173', { waitUntil: 'networkidle' });
+await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
 assert.equal(await page.title(), 'Northstar English');
 assert.equal(await page.locator('text=Today’s mission').count(), 1);
@@ -41,9 +42,9 @@ await page.reload({ waitUntil: 'networkidle' });
 await page.locator('#start-lesson').click();
 assert.ok((await page.locator('#draft').inputValue()).includes('Our school should create quiet zones'));
 
-const manifest = await page.request.get('http://127.0.0.1:4173/manifest.webmanifest');
+const manifest = await page.request.get(new URL('manifest.webmanifest', baseUrl).href);
 assert.equal(manifest.status(), 200);
-const serviceWorker = await page.request.get('http://127.0.0.1:4173/sw.js');
+const serviceWorker = await page.request.get(new URL('sw.js', baseUrl).href);
 assert.equal(serviceWorker.status(), 200);
 
 await page.reload({ waitUntil: 'networkidle' });
@@ -55,6 +56,7 @@ await context.setOffline(false);
 
 console.log(JSON.stringify({
   title: await page.title(),
+  baseUrl,
   viewport: '390x844@2x',
   horizontalOverflow: false,
   quizChoices: 16,
