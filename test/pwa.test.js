@@ -15,9 +15,16 @@ test('PWA manifest declares standalone display and required icons', async () => 
   await access(new URL('icons/apple-touch-icon.png', root));
 });
 
-test('service worker caches the application shell', async () => {
+test('service worker caches the application shell and all lesson batches', async () => {
   const worker = await readFile(new URL('sw.js', root), 'utf8');
-  for (const asset of ['./', './app.js', './styles.css', './manifest.webmanifest']) {
+  for (const asset of [
+    './', './app.js', './styles.css', './manifest.webmanifest',
+    './content/science-lessons-1.js', './content/science-lessons-2.js',
+    './content/technology-lessons-1.js', './content/technology-lessons-2.js',
+    './content/society-lessons-1.js', './content/society-lessons-2.js',
+    './content/learning-lessons-1.js', './content/learning-lessons-2.js',
+    './content/australia-lessons-1.js', './content/australia-lessons-2.js',
+  ]) {
     assert.ok(worker.includes(asset), `missing ${asset}`);
   }
 });

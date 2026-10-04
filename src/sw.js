@@ -1,10 +1,20 @@
-const CACHE = 'northstar-v3';
+const CACHE = 'northstar-v4';
 const SHELL = [
   './',
   './index.html',
   './app.js',
   './domain.js',
   './lessons.js',
+  './content/science-lessons-1.js',
+  './content/science-lessons-2.js',
+  './content/technology-lessons-1.js',
+  './content/technology-lessons-2.js',
+  './content/society-lessons-1.js',
+  './content/society-lessons-2.js',
+  './content/learning-lessons-1.js',
+  './content/learning-lessons-2.js',
+  './content/australia-lessons-1.js',
+  './content/australia-lessons-2.js',
   './styles.css',
   './manifest.webmanifest',
   './icons/icon-192.png',

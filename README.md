@@ -2,9 +2,11 @@
 
 A mobile-first Year 9 English coach designed for daily reading, writing and vocabulary practice. It installs as a Progressive Web App on iPhone and keeps learner data on the device.
 
+The built-in lessons are independent practice material, not official curriculum assessment or teacher grading.
+
 ## Features
 
-- Five evidence-rich Year 9 reading lessons
+- Ninety evidence-rich Year 9 reading lessons with a 90-day no-repeat rotation
 - Four comprehension questions with explanations per lesson
 - 140–180 word writing prompts
 - Transparent local draft-readiness feedback for length, structure, linking phrases and prompt relevance

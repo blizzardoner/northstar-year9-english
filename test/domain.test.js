@@ -22,6 +22,20 @@ test('getDailyLesson returns the same lesson for the same local date', () => {
   assert.equal(first.id, later.id);
 });
 
+test('getDailyLesson cycles through every lesson before repeating', () => {
+  const library = Array.from({ length: 90 }, (_, index) => ({ id: `lesson-${index}` }));
+  const start = new Date('2026-01-01T12:00:00+10:00');
+  const selected = new Set();
+
+  for (let offset = 0; offset < 90; offset += 1) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + offset);
+    selected.add(getDailyLesson(library, date).id);
+  }
+
+  assert.equal(selected.size, 90);
+});
+
 test('scoreComprehension scores answers and explains mistakes', () => {
   const questions = [
     { answer: 1, explanation: 'The second option is supported by paragraph two.' },

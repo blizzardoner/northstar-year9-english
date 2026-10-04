@@ -1,4 +1,15 @@
-export const lessons = [
+import { scienceLessons1 } from './content/science-lessons-1.js';
+import { scienceLessons2 } from './content/science-lessons-2.js';
+import { technologyLessons1 } from './content/technology-lessons-1.js';
+import { technologyLessons2 } from './content/technology-lessons-2.js';
+import { societyLessons1 } from './content/society-lessons-1.js';
+import { societyLessons2 } from './content/society-lessons-2.js';
+import { learningLessons1 } from './content/learning-lessons-1.js';
+import { learningLessons2 } from './content/learning-lessons-2.js';
+import { australiaLessons1 } from './content/australia-lessons-1.js';
+import { australiaLessons2 } from './content/australia-lessons-2.js';
+
+const coreLessons = [
   {
     id: 'cool-cities',
     theme: 'Environment',
@@ -152,4 +163,18 @@ Productive struggle is therefore neither effortless success nor endless frustrat
       { term: 'frustration', definition: 'annoyance caused by being unable to succeed', example: 'Too much difficulty can lead to frustration.' },
     ],
   },
+];
+
+export const lessons = [
+  ...coreLessons,
+  ...scienceLessons1,
+  ...scienceLessons2,
+  ...technologyLessons1,
+  ...technologyLessons2,
+  ...societyLessons1,
+  ...societyLessons2,
+  ...learningLessons1,
+  ...learningLessons2,
+  ...australiaLessons1,
+  ...australiaLessons2,
 ];

@@ -5,20 +5,14 @@ function localDateKey(date) {
   return `${year}-${month}-${day}`;
 }
 
-function hashText(text) {
-  let hash = 2166136261;
-  for (const char of text) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
 export function getDailyLesson(lessons, date = new Date()) {
   if (!Array.isArray(lessons) || lessons.length === 0) {
     throw new Error('At least one lesson is required.');
   }
-  return lessons[hashText(localDateKey(date)) % lessons.length];
+  const [year, month, day] = localDateKey(date).split('-').map(Number);
+  const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
+  const index = ((dayNumber % lessons.length) + lessons.length) % lessons.length;
+  return lessons[index];
 }
 
 export function scoreComprehension(questions, answers) {

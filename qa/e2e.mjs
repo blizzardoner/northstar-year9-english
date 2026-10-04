@@ -13,6 +13,7 @@ await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
 assert.equal(await page.title(), 'Northstar English');
 assert.equal(await page.locator('text=Today’s mission').count(), 1);
+assert.equal(await page.getByText(/Day \d+ of 90 · Year 9/).count(), 1);
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false);
 
 for (const selector of ['.primary', '.nav-btn']) {
