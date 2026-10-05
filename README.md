@@ -6,7 +6,8 @@ The built-in lessons are independent practice material, not official curriculum 
 
 ## Features
 
-- Ninety evidence-rich Year 9 reading lessons with a 90-day no-repeat rotation
+- 200 evidence-rich Year 9 reading lessons with a 200-day no-repeat rotation
+- One stable lesson per local calendar day, even during library upgrades
 - Four comprehension questions with explanations per lesson
 - 140–180 word writing prompts
 - Transparent local draft-readiness feedback for length, structure, linking phrases and prompt relevance

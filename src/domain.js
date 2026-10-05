@@ -15,6 +15,24 @@ export function getDailyLesson(lessons, date = new Date()) {
   return lessons[index];
 }
 
+export function resolveDailyLesson(lessons, date = new Date(), assignment = null) {
+  if (!Array.isArray(lessons) || lessons.length === 0) {
+    throw new Error('At least one lesson is required.');
+  }
+  const dateKey = localDateKey(date);
+  if (assignment?.dateKey === dateKey) {
+    const assignedLesson = lessons.find((lesson) => lesson.id === assignment.lessonId);
+    if (assignedLesson) {
+      return { lesson: assignedLesson, assignment };
+    }
+  }
+  const lesson = getDailyLesson(lessons, date);
+  return {
+    lesson,
+    assignment: { dateKey, lessonId: lesson.id },
+  };
+}
+
 export function scoreComprehension(questions, answers) {
   const results = questions.map((question, index) => ({
     correct: answers[index] === question.answer,

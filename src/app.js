@@ -1,5 +1,5 @@
-import { evaluateWriting, getDailyLesson, getDueWords, scoreComprehension, updateWordProgress } from './domain.js';
-import { lessons } from './lessons.js';
+import { evaluateWriting, getDueWords, resolveDailyLesson, scoreComprehension, updateWordProgress } from './domain.js';
+import { legacyLessons, lessons } from './lessons.js';
 
 const STORAGE_KEY = 'northstar-english-v1';
 const app = document.querySelector('#app');
@@ -11,16 +11,24 @@ let answers = [];
 let reviewReveal = false;
 let state = loadState();
 const today = new Date();
-const lesson = getDailyLesson(lessons, today);
+const previousLibrary = state.migratedFromVersion === 1 ? legacyLessons : lessons;
+const daily = resolveDailyLesson(previousLibrary, today, state.dailyLesson);
+const lesson = daily.lesson;
+state.dailyLesson = daily.assignment;
+delete state.migratedFromVersion;
+saveState();
 const lessonNumber = lessons.findIndex((item) => item.id === lesson.id) + 1;
+const activeDateKey = daily.assignment.dateKey;
 
 function defaultState() {
-  return { version: 1, completedDays: [], quizScores: {}, drafts: {}, words: {}, minutes: 0 };
+  return { version: 2, completedDays: [], quizScores: {}, drafts: {}, words: {}, minutes: 0, dailyLesson: null };
 }
 function loadState() {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return parsed?.version === 1 ? { ...defaultState(), ...parsed } : defaultState();
+    if (parsed?.version === 2) return { ...defaultState(), ...parsed };
+    if (parsed?.version === 1) return { ...defaultState(), ...parsed, version: 2, migratedFromVersion: 1 };
+    return defaultState();
   } catch { return defaultState(); }
 }
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -137,4 +145,7 @@ function renderSettings(){app.innerHTML=shell(`<div class="eyebrow">Settings</di
 function bindCommon(){document.querySelectorAll('[data-view]').forEach(button=>button.onclick=()=>{currentView=button.dataset.view;lessonMode=false;reviewReveal=false;render();scrollTo({top:0});});}
 
 render();
+window.setInterval(() => {
+  if (dateKey() !== activeDateKey) location.reload();
+}, 60_000);
 if('serviceWorker' in navigator && location.protocol!=='file:') window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));

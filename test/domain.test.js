@@ -5,6 +5,7 @@ import {
   evaluateWriting,
   getDailyLesson,
   getDueWords,
+  resolveDailyLesson,
   scoreComprehension,
   updateWordProgress,
 } from '../src/domain.js';
@@ -23,17 +24,44 @@ test('getDailyLesson returns the same lesson for the same local date', () => {
 });
 
 test('getDailyLesson cycles through every lesson before repeating', () => {
-  const library = Array.from({ length: 90 }, (_, index) => ({ id: `lesson-${index}` }));
+  const library = Array.from({ length: 200 }, (_, index) => ({ id: `lesson-${index}` }));
   const start = new Date('2026-01-01T12:00:00+10:00');
   const selected = new Set();
 
-  for (let offset = 0; offset < 90; offset += 1) {
+  for (let offset = 0; offset < 200; offset += 1) {
     const date = new Date(start);
     date.setDate(start.getDate() + offset);
     selected.add(getDailyLesson(library, date).id);
   }
 
-  assert.equal(selected.size, 90);
+  assert.equal(selected.size, 200);
+});
+
+test('resolveDailyLesson keeps the assigned lesson when the library grows', () => {
+  const date = new Date(2026, 9, 6, 9);
+  const originalLibrary = Array.from({ length: 90 }, (_, index) => ({ id: `lesson-${index}` }));
+  const expandedLibrary = [
+    ...originalLibrary,
+    ...Array.from({ length: 110 }, (_, index) => ({ id: `new-lesson-${index}` })),
+  ];
+  const initial = resolveDailyLesson(originalLibrary, date);
+  const afterUpgrade = resolveDailyLesson(expandedLibrary, date, initial.assignment);
+
+  assert.equal(afterUpgrade.lesson.id, initial.lesson.id);
+  assert.deepEqual(afterUpgrade.assignment, initial.assignment);
+});
+
+test('resolveDailyLesson selects a fresh assignment on the next local day', () => {
+  const library = Array.from({ length: 200 }, (_, index) => ({ id: `lesson-${index}` }));
+  const first = resolveDailyLesson(library, new Date(2026, 9, 6, 9));
+  const next = resolveDailyLesson(
+    library,
+    new Date(2026, 9, 7, 9),
+    first.assignment,
+  );
+
+  assert.notEqual(next.lesson.id, first.lesson.id);
+  assert.equal(next.assignment.dateKey, '2026-10-07');
 });
 
 test('scoreComprehension scores answers and explains mistakes', () => {

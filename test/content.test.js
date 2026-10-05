@@ -1,14 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { lessons } from '../src/lessons.js';
+import { legacyLessons, lessons } from '../src/lessons.js';
 
 const wordCount = (text) => (text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) ?? []).length;
 
-test('the library contains 90 complete and unique Year 9 lessons', () => {
-  assert.equal(lessons.length, 90);
-  assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, 90);
-  assert.equal(new Set(lessons.map((lesson) => lesson.title)).size, 90);
+test('the original 90 lessons remain the migration prefix in their original order', () => {
+  assert.equal(legacyLessons.length, 90);
+  assert.deepEqual(
+    lessons.slice(0, legacyLessons.length).map((lesson) => lesson.id),
+    legacyLessons.map((lesson) => lesson.id),
+  );
+});
+
+test('the library contains 200 complete and unique Year 9 lessons', () => {
+  assert.equal(lessons.length, 200);
+  assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, 200);
+  assert.equal(new Set(lessons.map((lesson) => lesson.title)).size, 200);
 
   for (const lesson of lessons) {
     assert.match(lesson.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);

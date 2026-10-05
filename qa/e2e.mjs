@@ -13,7 +13,9 @@ await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
 assert.equal(await page.title(), 'Northstar English');
 assert.equal(await page.locator('text=Today’s mission').count(), 1);
-assert.equal(await page.getByText(/Day \d+ of 90 · Year 9/).count(), 1);
+assert.equal(await page.getByText(/Day \d+ of 200 · Year 9/).count(), 1);
+const dailyTitle = await page.locator('.hero h1').textContent();
+const dailyAssignment = await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).dailyLesson);
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false);
 
 for (const selector of ['.primary', '.nav-btn']) {
@@ -40,6 +42,11 @@ await page.locator('#writing-feedback').scrollIntoViewIfNeeded();
 await page.screenshot({ path: 'artifacts/iphone-lesson.png' });
 
 await page.reload({ waitUntil: 'networkidle' });
+assert.equal(await page.locator('.hero h1').textContent(), dailyTitle);
+assert.deepEqual(
+  await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).dailyLesson),
+  dailyAssignment,
+);
 await page.locator('#start-lesson').click();
 assert.ok((await page.locator('#draft').inputValue()).includes('Our school should create quiet zones'));
 
@@ -55,12 +62,42 @@ await page.reload({ waitUntil: 'domcontentloaded' });
 assert.equal(await page.title(), 'Northstar English');
 await context.setOffline(false);
 
+const migrationContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+await migrationContext.addInitScript(() => {
+  localStorage.setItem('northstar-english-v1', JSON.stringify({
+    version: 1,
+    completedDays: [],
+    quizScores: {},
+    drafts: {},
+    words: {},
+    minutes: 0,
+  }));
+});
+const migrationPage = await migrationContext.newPage();
+await migrationPage.goto(baseUrl, { waitUntil: 'networkidle' });
+const migratedState = await migrationPage.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')));
+const expectedLegacyLessonId = await migrationPage.evaluate(async () => {
+  const [{ legacyLessons }, { getDailyLesson }] = await Promise.all([
+    import('./lessons.js'),
+    import('./domain.js'),
+  ]);
+  return getDailyLesson(legacyLessons, new Date()).id;
+});
+assert.equal(migratedState.version, 2);
+assert.equal(migratedState.dailyLesson.lessonId, expectedLegacyLessonId);
+const migratedTitle = await migrationPage.locator('.hero h1').textContent();
+await migrationPage.reload({ waitUntil: 'networkidle' });
+assert.equal(await migrationPage.locator('.hero h1').textContent(), migratedTitle);
+await migrationContext.close();
+
 console.log(JSON.stringify({
   title: await page.title(),
   baseUrl,
   viewport: '390x844@2x',
   horizontalOverflow: false,
   quizChoices: 16,
+  dailyLessonStableAcrossReload: true,
+  legacyStateMigrated: true,
   draftRestored: true,
   offlineReload: true,
   screenshots: ['artifacts/iphone-home.png', 'artifacts/iphone-lesson.png'],
