@@ -1,13 +1,27 @@
 import { scienceLessons1 } from './content/science-lessons-1.js';
 import { scienceLessons2 } from './content/science-lessons-2.js';
+import { scienceLessons3 } from './content/science-lessons-3.js';
+import { scienceLessons4 } from './content/science-lessons-4.js';
+import { scienceLessons5 } from './content/science-lessons-5.js';
 import { technologyLessons1 } from './content/technology-lessons-1.js';
 import { technologyLessons2 } from './content/technology-lessons-2.js';
+import { technologyLessons3 } from './content/technology-lessons-3.js';
+import { technologyLessons4 } from './content/technology-lessons-4.js';
 import { societyLessons1 } from './content/society-lessons-1.js';
 import { societyLessons2 } from './content/society-lessons-2.js';
+import { societyLessons3 } from './content/society-lessons-3.js';
+import { societyLessons4 } from './content/society-lessons-4.js';
 import { learningLessons1 } from './content/learning-lessons-1.js';
 import { learningLessons2 } from './content/learning-lessons-2.js';
+import { learningLessons3 } from './content/learning-lessons-3.js';
+import { learningLessons4 } from './content/learning-lessons-4.js';
 import { australiaLessons1 } from './content/australia-lessons-1.js';
 import { australiaLessons2 } from './content/australia-lessons-2.js';
+import { australiaLessons3 } from './content/australia-lessons-3.js';
+import { australiaLessons4 } from './content/australia-lessons-4.js';
+import { cultureLessons1 } from './content/culture-lessons-1.js';
+import { economicsLessons1 } from './content/economics-lessons-1.js';
+import { healthLessons1 } from './content/health-lessons-1.js';
 
 const coreLessons = [
   {
@@ -165,7 +179,7 @@ Productive struggle is therefore neither effortless success nor endless frustrat
   },
 ];
 
-export const lessons = [
+export const legacyLessons = [
   ...coreLessons,
   ...scienceLessons1,
   ...scienceLessons2,
@@ -177,4 +191,22 @@ export const lessons = [
   ...learningLessons2,
   ...australiaLessons1,
   ...australiaLessons2,
+];
+
+export const lessons = [
+  ...legacyLessons,
+  ...scienceLessons3,
+  ...scienceLessons4,
+  ...scienceLessons5,
+  ...technologyLessons3,
+  ...technologyLessons4,
+  ...societyLessons3,
+  ...societyLessons4,
+  ...learningLessons3,
+  ...learningLessons4,
+  ...australiaLessons3,
+  ...australiaLessons4,
+  ...cultureLessons1,
+  ...economicsLessons1,
+  ...healthLessons1,
 ];
