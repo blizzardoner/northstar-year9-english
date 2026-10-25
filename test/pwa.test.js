@@ -17,6 +17,7 @@ test('PWA manifest declares standalone display and required icons', async () => 
 
 test('service worker caches the application shell and all lesson batches', async () => {
   const worker = await readFile(new URL('sw.js', root), 'utf8');
+  assert.match(worker, /northstar-v6/);
   for (const asset of [
     './', './app.js', './styles.css', './manifest.webmanifest',
     './content/science-lessons-1.js', './content/science-lessons-2.js',

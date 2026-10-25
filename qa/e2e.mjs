@@ -12,10 +12,10 @@ const page = await context.newPage();
 await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
 assert.equal(await page.title(), 'Northstar English');
-assert.equal(await page.locator('text=Today’s mission').count(), 1);
-assert.equal(await page.getByText(/Day \d+ of 200 · Year 9/).count(), 1);
-const dailyTitle = await page.locator('.hero h1').textContent();
-const dailyAssignment = await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).dailyLesson);
+assert.equal(await page.locator('text=Current reading').count(), 1);
+assert.equal(await page.getByText(/Article \d+ of 200 · Year 9/).count(), 1);
+const currentTitle = await page.locator('.hero h1').textContent();
+const currentLessonId = await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).currentLessonId);
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false);
 
 for (const selector of ['.primary', '.nav-btn']) {
@@ -25,9 +25,21 @@ for (const selector of ['.primary', '.nav-btn']) {
 
 await mkdir('artifacts', { recursive: true });
 await page.screenshot({ path: 'artifacts/iphone-home.png' });
-await page.locator('#start-lesson').click();
+await page.reload({ waitUntil: 'networkidle' });
+assert.equal(await page.locator('.hero h1').textContent(), currentTitle);
+assert.equal(
+  await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).currentLessonId),
+  currentLessonId,
+);
+await page.locator('.next-article').click();
+const nextTitle = await page.locator('.reader-title').textContent();
+const nextLessonId = await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).currentLessonId);
+assert.notEqual(nextTitle, currentTitle);
+assert.notEqual(nextLessonId, currentLessonId);
 assert.equal(await page.locator('.choice').count(), 16);
 assert.equal(await page.locator('#draft').count(), 1);
+await page.locator('.reader-advance').scrollIntoViewIfNeeded();
+await page.screenshot({ path: 'artifacts/iphone-next-article.png' });
 for (let question = 0; question < 4; question += 1) await page.locator(`.choice[data-q="${question}"]`).first().click();
 assert.equal(await page.locator('#check-answers').isEnabled(), true);
 await page.locator('#check-answers').click();
@@ -42,10 +54,10 @@ await page.locator('#writing-feedback').scrollIntoViewIfNeeded();
 await page.screenshot({ path: 'artifacts/iphone-lesson.png' });
 
 await page.reload({ waitUntil: 'networkidle' });
-assert.equal(await page.locator('.hero h1').textContent(), dailyTitle);
-assert.deepEqual(
-  await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).dailyLesson),
-  dailyAssignment,
+assert.equal(await page.locator('.hero h1').textContent(), nextTitle);
+assert.equal(
+  await page.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')).currentLessonId),
+  nextLessonId,
 );
 await page.locator('#start-lesson').click();
 assert.ok((await page.locator('#draft').inputValue()).includes('Our school should create quiet zones'));
@@ -83,12 +95,32 @@ const expectedLegacyLessonId = await migrationPage.evaluate(async () => {
   ]);
   return getDailyLesson(legacyLessons, new Date()).id;
 });
-assert.equal(migratedState.version, 2);
-assert.equal(migratedState.dailyLesson.lessonId, expectedLegacyLessonId);
+assert.equal(migratedState.version, 3);
+assert.equal(migratedState.currentLessonId, expectedLegacyLessonId);
 const migratedTitle = await migrationPage.locator('.hero h1').textContent();
 await migrationPage.reload({ waitUntil: 'networkidle' });
 assert.equal(await migrationPage.locator('.hero h1').textContent(), migratedTitle);
 await migrationContext.close();
+
+const versionTwoContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+await versionTwoContext.addInitScript(() => {
+  localStorage.setItem('northstar-english-v1', JSON.stringify({
+    version: 2,
+    completedDays: [],
+    quizScores: {},
+    drafts: {},
+    words: {},
+    minutes: 0,
+    dailyLesson: { dateKey: '2000-01-01', lessonId: 'cool-cities' },
+  }));
+});
+const versionTwoPage = await versionTwoContext.newPage();
+await versionTwoPage.goto(baseUrl, { waitUntil: 'networkidle' });
+const versionTwoState = await versionTwoPage.evaluate(() => JSON.parse(localStorage.getItem('northstar-english-v1')));
+assert.equal(versionTwoState.version, 3);
+assert.equal(versionTwoState.currentLessonId, 'cool-cities');
+assert.equal(await versionTwoPage.locator('.hero h1').textContent(), 'Can a City Learn to Stay Cool?');
+await versionTwoContext.close();
 
 console.log(JSON.stringify({
   title: await page.title(),
@@ -96,10 +128,11 @@ console.log(JSON.stringify({
   viewport: '390x844@2x',
   horizontalOverflow: false,
   quizChoices: 16,
-  dailyLessonStableAcrossReload: true,
-  legacyStateMigrated: true,
+  currentArticleStableAcrossReload: true,
+  manualNextArticlePersists: true,
+  legacyStatesMigrated: true,
   draftRestored: true,
   offlineReload: true,
-  screenshots: ['artifacts/iphone-home.png', 'artifacts/iphone-lesson.png'],
+  screenshots: ['artifacts/iphone-home.png', 'artifacts/iphone-next-article.png', 'artifacts/iphone-lesson.png'],
 }, null, 2));
 await browser.close();

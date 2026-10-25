@@ -5,6 +5,8 @@ import {
   evaluateWriting,
   getDailyLesson,
   getDueWords,
+  getNextLesson,
+  resolveCurrentLesson,
   resolveDailyLesson,
   scoreComprehension,
   updateWordProgress,
@@ -15,6 +17,20 @@ const lessons = [
   { id: 'b', title: 'B' },
   { id: 'c', title: 'C' },
 ];
+
+test('resolveCurrentLesson keeps the saved article until the learner advances', () => {
+  const firstLoad = resolveCurrentLesson(lessons, 'b');
+  const muchLater = resolveCurrentLesson(lessons, 'b');
+
+  assert.equal(firstLoad.id, 'b');
+  assert.equal(muchLater.id, 'b');
+});
+
+test('getNextLesson advances once and wraps after the final article', () => {
+  assert.equal(getNextLesson(lessons, 'a').id, 'b');
+  assert.equal(getNextLesson(lessons, 'b').id, 'c');
+  assert.equal(getNextLesson(lessons, 'c').id, 'a');
+});
 
 test('getDailyLesson returns the same lesson for the same local date', () => {
   const first = getDailyLesson(lessons, new Date('2026-10-03T08:00:00+10:00'));
