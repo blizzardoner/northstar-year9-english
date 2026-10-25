@@ -75,6 +75,10 @@ h3 { font-size:18px; letter-spacing:-.25px; }
 .passage { padding:22px 20px; border-radius:22px; background:#f8fafc; color:#1d2738; border:1px solid var(--line); font-family:Georgia, "Times New Roman", serif; font-size:18px; line-height:1.7; box-shadow:var(--shadow); }
 .passage p { margin-bottom:1.2em; }
 .passage p:last-child { margin-bottom:0; }
+.reader-advance { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-top:18px; background:#eef5ff; }
+.reader-advance h2 { margin:5px 0 8px; font-size:21px; }
+.reader-advance p { margin-bottom:0; }
+.reader-advance .secondary { flex:0 0 auto; }
 .lesson-step { margin:32px 0 0; }
 .question { margin-bottom:24px; }
 .question-number { color:var(--blue); font-size:12px; font-weight:750; }
@@ -141,5 +145,7 @@ h3 { font-size:18px; letter-spacing:-.25px; }
 @media (max-width:480px) {
   .section-head .section-note { display:none; }
   .editor { resize:none; }
+  .reader-advance { align-items:stretch; flex-direction:column; }
+  .reader-advance .secondary { width:100%; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition:none!important; } }

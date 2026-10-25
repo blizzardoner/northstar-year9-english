@@ -33,6 +33,23 @@ export function resolveDailyLesson(lessons, date = new Date(), assignment = null
   };
 }
 
+export function resolveCurrentLesson(lessons, currentLessonId, fallbackLesson = null) {
+  if (!Array.isArray(lessons) || lessons.length === 0) {
+    throw new Error('At least one lesson is required.');
+  }
+  return lessons.find((lesson) => lesson.id === currentLessonId)
+    ?? lessons.find((lesson) => lesson.id === fallbackLesson?.id)
+    ?? lessons[0];
+}
+
+export function getNextLesson(lessons, currentLessonId) {
+  if (!Array.isArray(lessons) || lessons.length === 0) {
+    throw new Error('At least one lesson is required.');
+  }
+  const currentIndex = lessons.findIndex((lesson) => lesson.id === currentLessonId);
+  return lessons[(currentIndex + 1) % lessons.length];
+}
+
 export function scoreComprehension(questions, answers) {
   const results = questions.map((question, index) => ({
     correct: answers[index] === question.answer,
